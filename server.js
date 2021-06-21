@@ -83,7 +83,6 @@ io.on("connection", (socket) => {
 	socket.on("update_news_content", async (data, content) => {
 		if (req.session.user !== undefined) {
 			let news = await NewsModel.update(data.id, req.session.user._id, data.content);
-			console.log(news);
 			if (news.nModified > 0) {
 				socket.emit("message", `News entered with title ${news.title}`);
 			} else {
@@ -99,6 +98,26 @@ io.on("connection", (socket) => {
 	// Data in format: id{string}
 	socket.on("find_by_id", async (id) => {
 		console.log(await NewsModel.findById(id));
+	});
+
+	// Adding comment to news
+	// Data in json format with keys: [id{mongodb _id}, content{string}]
+	socket.on("add_comment", async (data) => {
+		if (req.session.user !== undefined) {
+			let comment = {
+				by: req.session.user._id,
+				content: data.content,
+			};
+			let news = await NewsModel.addComment(data.id, comment);
+			if (news) {
+				socket.emit("message", `Comment entered in News title ${news.title}`);
+			} else {
+				socket.emit("message", "Error in ading comment!!");
+			}
+		} else {
+			console.log("User is not logged in!! Login to add comment");
+			socket.emit("message", `User is not logged in!! Login to add comment`);
+		}
 	});
 
 	// Runs when user disconnects

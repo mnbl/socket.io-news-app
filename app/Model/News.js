@@ -57,7 +57,7 @@ class News extends Model {
 		try {
 			let news = await Model.findOne({ _id: id });
 			news.comments.push(comment);
-			await news.save();
+			return await news.save();
 		} catch (error) {
 			console.log(error);
 			return null;
