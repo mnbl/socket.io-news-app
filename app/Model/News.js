@@ -64,16 +64,20 @@ class News extends Model {
 		}
 	}
 
-	// static async updateComment(news_id, comment_id, comment) {
-	// 	try {
-	// 		let comment = await Model.findOne({ comments: { _id: comment_id } });
-	// 		// return await Model.updateOne({ comments: { _id: comment_id } }, {$set: });
-	// 		await news.save();
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		return null;
-	// 	}
-	// }
+	static async updateComment(news_id, comment_id, comment) {
+		try {
+			let news = await Model.findOne({ _id: news_id });
+			for (let i = 0; i < news.comments.length; i++) {
+				if (news.comments[i].id == comment_id) {
+					news.comments[i].content = comment;
+				}
+			}
+			return await news.save();
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	}
 }
 
 module.exports = News;

@@ -120,6 +120,22 @@ io.on("connection", (socket) => {
 		}
 	});
 
+	// update comment to news
+	// Data in json format with keys: [news_id{mongodb _id}, comment_id{mongodb_id}, comment{string}]
+	socket.on("update_comment", async (data) => {
+		if (req.session.user !== undefined) {
+			let news = await NewsModel.updateComment(data.news_id, data.comment_id, data.comment);
+			if (news) {
+				socket.emit("message", `Comment updated for News with title ${news.title}`);
+			} else {
+				socket.emit("message", "Error in updating comment!!");
+			}
+		} else {
+			console.log("User is not logged in!! Login to update comment");
+			socket.emit("message", `User is not logged in!! Login to update comment`);
+		}
+	});
+
 	// Runs when user disconnects
 	socket.on("disconnect", () => {
 		// Send users list and room info
